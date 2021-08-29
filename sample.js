@@ -3,6 +3,19 @@ var INDENT = "%0D%0A";
 var REPORT = ['gotoReport_', 'arrivalReport_' , 'backHomeReport_']
 var TABLE_TITLE = ['日付', '出発時上番報告' , '到着時上番報告','下番報告']
 
+//給与計算用の定数
+//24日以上
+const OVER_24_PAY = 9094;
+
+//22日以上
+const OVER_22_PAY = 8420;
+
+//21日まで
+const UNDER_21_PAY = 7300;
+
+//残業代（１時間毎）
+const OVERTIME_PER_HOUR_PAY = 1053;
+
 //変数storageにlocalStorageを格納
 var storage = localStorage;
 
@@ -12,6 +25,12 @@ function define(name, value){
    get: function(){return value;},
    set: function(){throw(name+' is already defined !!');},
   });
+}
+
+//サイト読み込み時に起動させる初期化関数
+window.onload = function(){
+    const date = new Date();
+    document.getElementById("集計月").value = date.getFullYear() + "-" + ("00" + (date.getMonth() + 1)).slice(-2);
 }
 
 function buttonClick() {
@@ -87,6 +106,103 @@ function saveReport(keyDay,time){
 
 }
 
+//報告状況のカウント
+function count_report(year,month) {
+    
+    //出勤日数（下番報告とする）の総数をカウント
+    var sumWorkDay = 0;
+
+    //最終日までカウント
+    var monthDayCount = getLastDay(year,(month + 1));
+    for(i = 0;i < monthDayCount;i++){
+
+        //選定文字列を取得
+        dayStr = createDayStr(year,month,i+1);
+
+        //セル内の文字列設定
+        //ストレージの内容を一行分
+        var k = REPORT[2] + dayStr;
+        value = storage.getItem(k);
+        if( value != null ){
+            //出勤数のカウント
+            sumWorkDay++;
+        }
+    }
+    return sumWorkDay;
+}
+
+//給与計算（実計算部分）
+//(出勤日数、残業時間、交通費、その他手当（１日当たり）)
+function payMath(totalDay,overTime,transExp,otherAllow){
+
+    var payResult = 0;
+
+    //計算用に使用
+    var work24OverDay = totalDay - 23;
+    var work22OberDay = totalDay - 21;
+    var work21UnderDay = totalDay;
+
+    //規定勤務日数別に分割して計算
+    if(work24OverDay >= 1){
+        //割り増し基本給（24日以上）
+        payResult += work24OverDay * OVER_24_PAY;
+
+    }
+    if(work22OberDay >= 1){
+        //24日以上の場合は頭切りする
+        if(work22OberDay > 2){work22OberDay = 2;}
+
+        //割り増し基本給（22日以上）
+        payResult += work22OberDay * OVER_22_PAY;
+
+        //22日以上の場合は21日までの分は丸々出るので21に固定
+        work21UnderDay = 21;
+
+    }
+
+    //21日までの基本給
+    payResult += work21UnderDay * UNDER_21_PAY;
+
+    //残業時間の計算
+    payResult += overTime * OVERTIME_PER_HOUR_PAY;
+
+    //交通費の計算
+    payResult += totalDay * transExp;
+
+    //その他手当の計算
+    payResult += totalDay * otherAllow;
+
+    return payResult;
+
+}
+
+
+//給与算出
+function payroll(){
+
+    //勤務日数総数
+    var totalDay;
+
+    //計算結果
+    var result;
+
+    //htmlタグからの取得
+    var overTime    = Number(document.getElementById("残業時間").value);
+    var transExp    = Number(document.getElementById("交通費").value);
+    var otherAllow  = Number(document.getElementById("その他手当").value);
+
+    //今月の数字を取得
+    const date = new Date();
+    totalDay = count_report(date.getFullYear(),date.getMonth() + 1)
+
+    //計算
+    result = payMath(totalDay,overTime,transExp,otherAllow);
+
+    //計算結果を該当タグに記載
+    var payResult = document.getElementById("payResult");
+    payResult.textContent = result;
+}
+
 //テーブル作成
 function generate_table() {
     // get the reference for the body
@@ -117,6 +233,8 @@ function generate_table() {
     const date = new Date();
     var monthDayCount = getLastDay(date.getFullYear(),(date.getMonth() + 1));
     
+    //出勤日数（下番報告とする）の総数をカウント
+    var sumWorkDay = 0;
 
     // creating all cells
     for (var i = 0; i < monthDayCount; i++) {
@@ -125,6 +243,8 @@ function generate_table() {
 
         //日付行
         var dateCell = document.createElement("td");
+        
+        //date.getFullYear()で現在の年　date.getMonth()で現在の月　可変にするならここ
         rawDayStr = createDayStr(date.getFullYear(),(date.getMonth() + 1),i+1);
         dateCellStr = document.createTextNode(rawDayStr);
         dateCell.appendChild(dateCellStr);
@@ -147,6 +267,12 @@ function generate_table() {
             }else{
                 var result = value;
                 cellText = document.createTextNode(result);
+
+                //出勤数のカウント
+                if(j == 2){
+                    sumWorkDay++;
+                }
+
             }
             cell.appendChild(cellText);
             row.appendChild(cell);

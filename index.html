@@ -12,6 +12,14 @@
         <input type="button" onclick="gotoReport();" value="出発時上番報告"/><br/>
         <input type="button" onclick="arrivalReport();" value="到着時上番報告"/><br/>
         <input type="button" onclick="backHomeReport();" value="下番報告"/><br/>
+
+        <hr style="border:0;border-top:1px solid red;">
+
+        <input type="button" onclick="payroll();" value="給与計算"/>今月度の給与：<span id="payResult">???</span><br/>
+        集計月：<input type="month" id="集計月" value="2021-01"><br/>
+        <input type="number" placeholder="残業時間" id="残業時間" >
+        <input type="number" placeholder="交通費" id="交通費" step="100">
+        <input type="number" placeholder="その他手当" id="その他手当" step="100"><br/>
         <!--
         名前：<input type="text" id="name" name="name" size="40">
         <input type="button" onclick="buttonClick();" value="Button"/><br/>
