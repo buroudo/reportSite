@@ -233,8 +233,13 @@ function generate_table() {
     const date = new Date();
     var monthDayCount = getLastDay(date.getFullYear(),(date.getMonth() + 1));
     
+<<<<<<< HEAD
     //出勤日数（下番報告とする）の総数をカウント
     var sumWorkDay = 0;
+=======
+    //出勤日数(下番報告とする)の総数をカウント
+　　　var sumWorkDay = 0;
+>>>>>>> 173407ffed6a6681bcd6adea6c79a23caf69ebc5
 
     // creating all cells
     for (var i = 0; i < monthDayCount; i++) {
@@ -276,6 +281,11 @@ function generate_table() {
             }
             cell.appendChild(cellText);
             row.appendChild(cell);
+
+            //出勤日数のカウント
+            if(j == 2){
+                sumWorkDay += 1;
+            }
         }
     
       // add the row to the end of the table body
