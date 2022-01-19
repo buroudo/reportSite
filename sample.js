@@ -192,7 +192,7 @@ function payroll(){
     var otherAllow  = Number(document.getElementById("その他手当").value);
 
     //今月の数字を取得
-    const date = new Date();
+    const date = new Date(document.getElementById("集計月").value);
     totalDay = count_report(date.getFullYear(),date.getMonth() + 1)
 
     //計算
@@ -230,7 +230,7 @@ function generate_table() {
         tblBody.appendChild(row);
     }
     //指定月の日数を取得する。
-    const date = new Date();
+    const date = new Date(document.getElementById("集計月").value);
     var monthDayCount = getLastDay(date.getFullYear(),(date.getMonth() + 1));
     
     //出勤日数（下番報告とする）の総数をカウント
