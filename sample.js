@@ -5,16 +5,19 @@ var TABLE_TITLE = ['日付', '出発時上番報告' , '到着時上番報告','
 
 //給与計算用の定数
 //24日以上
-const OVER_24_PAY = 9094;
+//const OVER_24_PAY = 9094; //R3年9月まで
+const OVER_24_PAY = 9400; //R3年10月以降
 
 //22日以上
-const OVER_22_PAY = 8420;
+//const OVER_22_PAY = 8420; //R3年9月まで
+const OVER_22_PAY = 8700; //R3年10月以降
 
 //21日まで
-const UNDER_21_PAY = 7300;
+//const UNDER_21_PAY = 7300; //R3年9月まで
+const UNDER_21_PAY = 7600; //R3年10月以降
 
 //残業代（１時間毎）
-const OVERTIME_PER_HOUR_PAY = 1053;
+const OVERTIME_PER_HOUR_PAY = 1088;
 
 //変数storageにlocalStorageを格納
 var storage = localStorage;
